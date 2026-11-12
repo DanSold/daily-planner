@@ -1,27 +1,30 @@
-from fastapi import FastAPI
+from pathlib import Path
+
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(title="Daily Planner")
 
+app.mount(
+    "/static",
+    StaticFiles(directory=str(BASE_DIR / "static")),
+    name="static",)
+
+templates = Jinja2Templates(
+    directory=str(BASE_DIR / "templates"),)
+
 
 @app.get("/", response_class=HTMLResponse)
-async def home():
-    return """
-    <!doctype html>
-    <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Daily Planner</title>
-        </head>
-        <body>
-            <main>
-                <h1>Daily Planner</h1>
-                <p>The application is up and running</p>
-            </main>
-        </body>
-    </html>
-    """
+async def home(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="planner.html",
+        context={"page_title": "Daily Planner"},
+    )
 
 
 @app.get("/health")
