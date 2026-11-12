@@ -43,3 +43,42 @@ Open http://127.0.0.1:8000/
 Stop the server: Ctrl+C.
 
 Python 3.14.5
+
+## Local Database Setup
+
+Docker with Docker Compose is required.
+
+1. Copy `.env.example` to `.env`.
+2. Set a local database password in `.env`.
+3. Install the Python dependencies in the activated virtual environment:
+
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
+4. Start PostgreSQL:
+
+   ```bash
+   docker compose up -d db
+   ```
+
+5. Check the container status:
+
+   ```bash
+   docker compose ps
+   ```
+
+6. Verify the asynchronous database connection:
+
+   ```bash
+   python -m app.check_db
+   ```
+
+To stop PostgreSQL without deleting its data:
+
+```bash
+docker compose down
+```
+
+Do not commit `.env`. Do not use the local development credentials
+for a public deployment.
