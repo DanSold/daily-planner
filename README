@@ -82,3 +82,29 @@ docker compose down
 
 Do not commit `.env`. Do not use the local development credentials
 for a public deployment.
+
+## Database Migrations
+
+Alembic is configured to use the application's asynchronous
+PostgreSQL connection settings.
+
+Run commands from the project root with the virtual environment
+activated and PostgreSQL running.
+
+Check the current database revision:
+
+```bash
+python -m alembic current
+```
+
+List the latest migration revisions:
+
+```bash
+python -m alembic heads
+```
+
+No application table migrations have been added yet.
+The initial migration will be created after the User and Task
+models are reviewed and imported into the migration environment.
+
+Do not put database credentials in alembic.ini.
