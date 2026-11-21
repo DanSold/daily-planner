@@ -18,61 +18,58 @@ Search and task priorities are optional features to be added after the core func
 
 ## Local Setup
 
-Create a virtual environment:
+Requirements: Python 3.14 and Docker with Docker Compose.
 
-Windows:
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
+1. Create and activate a virtual environment.
 
-macOS / Linux:
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
+   Windows:
+   ```powershell
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
 
-Install dependencies and run the application:
-```bash
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload
-```
+   macOS / Linux:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
 
-Open http://127.0.0.1:8000/
-
-Stop the server: Ctrl+C.
-
-Python 3.14.5
-
-## Local Database Setup
-
-Docker with Docker Compose is required.
-
-1. Copy `.env.example` to `.env`.
-2. Set a local database password in `.env`.
-3. Install the Python dependencies in the activated virtual environment:
+2. Install the dependencies:
 
    ```bash
    python -m pip install -r requirements.txt
    ```
 
-4. Start PostgreSQL:
+3. Copy `.env.example` to `.env` and set a local database password.
+
+4. Start PostgreSQL and check that the container is healthy:
 
    ```bash
    docker compose up -d db
-   ```
-
-5. Check the container status:
-
-   ```bash
    docker compose ps
    ```
 
-6. Verify the asynchronous database connection:
+5. Verify the asynchronous database connection:
 
    ```bash
    python -m app.check_db
    ```
+
+6. Apply the database migrations:
+
+   ```bash
+   python -m alembic upgrade head
+   ```
+
+7. Run the application:
+
+   ```bash
+   python -m uvicorn app.main:app --reload
+   ```
+
+8. Open http://127.0.0.1:8000/
+
+Stop the server: Ctrl+C.
 
 To stop PostgreSQL without deleting its data:
 

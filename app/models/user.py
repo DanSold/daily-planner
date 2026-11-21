@@ -27,7 +27,8 @@ class User(Base):
         server_default=func.now(),
         nullable=False,
     )
+
     display_name: Mapped[str] = mapped_column(
-    String(100),
-    nullable=False,
-)
+        String(100),
+        nullable=False,
+    )

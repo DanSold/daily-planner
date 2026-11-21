@@ -1,13 +1,12 @@
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.routers.auth import router as auth_router
-
-from fastapi.exceptions import RequestValidationError
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -18,16 +17,18 @@ app.include_router(auth_router)
 app.mount(
     "/static",
     StaticFiles(directory=str(BASE_DIR / "static")),
-    name="static", )
+    name="static",
+)
 
 templates = Jinja2Templates(
-    directory=str(BASE_DIR / "templates"), )
+    directory=str(BASE_DIR / "templates"),
+)
 
 
 @app.exception_handler(RequestValidationError)
 async def handle_validation_error(
-        request: Request,
-        exc: RequestValidationError,
+    request: Request,
+    exc: RequestValidationError,
 ) -> JSONResponse:
     errors = [
         {
