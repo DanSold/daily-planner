@@ -123,7 +123,7 @@ Check whether model changes require a new migration:
 python -m alembic check
 ```
 
-The initial migration will be created after the User and Task
-models are reviewed and imported into the migration environment.
+The initial migration creates the users and tasks tables,
+including the task owner foreign key and task indexes.
 
 Do not put database credentials in alembic.ini.
