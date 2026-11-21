@@ -103,7 +103,26 @@ List the latest migration revisions:
 python -m alembic heads
 ```
 
-No application table migrations have been added yet.
+## Apply Database Migrations
+
+After starting PostgreSQL, apply the database migrations:
+
+```bash
+python -m alembic upgrade head
+```
+
+Check the current database revision:
+
+```bash
+python -m alembic current
+```
+
+Check whether model changes require a new migration:
+
+```bash
+python -m alembic check
+```
+
 The initial migration will be created after the User and Task
 models are reviewed and imported into the migration environment.
 
