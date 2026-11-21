@@ -127,3 +127,38 @@ The initial migration creates the users and tasks tables,
 including the task owner foreign key and task indexes.
 
 Do not put database credentials in alembic.ini.
+
+## User Registration
+
+The application provides a registration endpoint:
+
+```text
+POST /register
+```
+
+It accepts form fields using `application/x-www-form-urlencoded`:
+
+- `display_name`: 1–100 characters after trimming outer whitespace.
+- `email`: a valid email address, stored in lowercase.
+- `password`: 15–128 characters.
+
+Passwords are hashed before being stored.
+
+Response statuses:
+
+- `201 Created`: the account was created.
+- `409 Conflict`: the email address is already registered.
+- `422 Unprocessable Entity`: the submitted data is invalid.
+
+Successful responses do not include passwords or password hashes.
+Validation responses omit submitted input values.
+
+Registration does not log the user in or create a session.
+
+To test registration locally, start the application and open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+Use test credentials only.
