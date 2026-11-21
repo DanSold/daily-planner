@@ -5,9 +5,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from app.routers.auth import router as auth_router
+
 BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(title="Daily Planner")
+
+app.include_router(auth_router)
 
 app.mount(
     "/static",
