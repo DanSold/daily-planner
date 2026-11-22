@@ -160,16 +160,82 @@ http://127.0.0.1:8000/docs
 
 Use test credentials only.
 
-## Docker DB
+## Login and Sessions
 
-``` Docker image terminal
+The application uses server-side sessions stored in PostgreSQL.
+
+| Endpoint | Description | Response statuses |
+|---|---|---|
+| `POST /login` | Checks the email and password and starts a session | `200 OK`, `401 Unauthorized`, `422 Unprocessable Entity` |
+| `GET /me` | Returns the currently logged-in user | `200 OK`, `401 Unauthorized` |
+| `POST /logout` | Ends the current session | `204 No Content` |
+
+`POST /login` accepts form fields using `application/x-www-form-urlencoded`:
+
+- `email`: the registered email address (case-insensitive).
+- `password`: the account password.
+
+An unknown email address and a wrong password return the same
+`401` message: `Invalid email or password.`
+
+How sessions work:
+
+- After a successful login, the browser receives a `planner_session` cookie
+  that contains a random session token.
+- The cookie is `HttpOnly`, uses `SameSite=Lax`, and is valid for 7 days.
+- Only a SHA-256 hash of the token is stored in the `user_sessions` table.
+  The token itself is never stored.
+- A session is rejected after its expiration time, even if the browser
+  still sends the cookie.
+- Logging out deletes the session from the database and removes the cookie.
+  Logging out without a session also returns `204`.
+
+Protected routes use the `get_current_user` dependency from
+`app/dependencies.py`. It returns `401 Unauthorized` when there is no valid
+session.
+
+### Session Settings
+
+| Variable | Default | Description |
+|---|---|---|
+| `SESSION_COOKIE_SECURE` | `false` | Send the cookie over HTTPS only. Keep `false` for local `http://` development. Must be `true` in a public deployment. |
+| `SESSION_COOKIE_NAME` | `planner_session` | Name of the session cookie. |
+| `SESSION_LIFETIME_DAYS` | `7` | Session lifetime in days (1–30). |
+
+### Testing Login Locally
+
+1. Start the application and open http://127.0.0.1:8000/docs.
+2. Register a user with `POST /register`.
+3. Log in with `POST /login`. The browser stores the session cookie.
+4. Call `GET /me`. It returns the logged-in user.
+5. Call `POST /logout`, then `GET /me` again. It returns `401`.
+
+CSRF protection is not implemented yet. It will be added together with
+the HTML login and registration pages.
+
+## Inspecting the Local Database
+
+Open a shell in the database container:
+
+```bash
+docker compose exec db sh
+```
+
+Connect to PostgreSQL inside the container:
+
+```sh
 psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
 ```
 
+List the tables:
 
-Viewing users in the database:
+```text
+\dt
+```
 
-``` Docker image terminal
+View users and check that passwords are stored as Argon2 hashes:
+
+```sql
 SELECT
     id,
     display_name,
@@ -178,16 +244,31 @@ SELECT
 FROM users;
 ```
 
-View token IDs and expiration date:
+View sessions and their expiration times:
 
-``` Docker image terminal
+```sql
 SELECT user_id, length(token_hash) AS hash_length, expires_at
 FROM user_sessions;
 ```
 
+`hash_length` should be `64`.
 
-Deleting a Docker container and volumes:
+Exit `psql` with `\q`, then exit the container shell with `exit`.
+
+### Resetting the Local Database
+
+**Warning:** the following command permanently deletes all local
+database data, including users, tasks, and sessions:
 
 ```bash
 docker compose down -v
 ```
+
+After a reset, start PostgreSQL again and reapply the migrations:
+
+```bash
+docker compose up -d db
+python -m alembic upgrade head
+```
+
+Use `docker compose down` (without `-v`) to stop PostgreSQL and keep the data.
