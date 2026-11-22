@@ -19,5 +19,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    session_cookie_name: str = "planner_session"
+    session_cookie_secure: bool = False
+    session_lifetime_days: int = Field(default=7, ge=1, le=30)
 
 settings = Settings()
