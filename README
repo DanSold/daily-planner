@@ -159,3 +159,35 @@ http://127.0.0.1:8000/docs
 ```
 
 Use test credentials only.
+
+## Docker DB
+
+``` Docker image terminal
+psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+```
+
+
+Viewing users in the database:
+
+``` Docker image terminal
+SELECT
+    id,
+    display_name,
+    email,
+    password_hash LIKE '$argon2%' AS uses_argon2
+FROM users;
+```
+
+View token IDs and expiration date:
+
+``` Docker image terminal
+SELECT user_id, length(token_hash) AS hash_length, expires_at
+FROM user_sessions;
+```
+
+
+Deleting a Docker container and volumes:
+
+```bash
+docker compose down -v
+```

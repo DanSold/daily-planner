@@ -38,3 +38,20 @@ class UserPublic(BaseModel):
     id: int
     display_name: str
     email: EmailStr
+
+
+class LoginInput(BaseModel):
+    email: EmailStr = Field(max_length=254)
+    password: str = Field(
+        min_length=1,
+        max_length=128,
+        repr=False,
+        json_schema_extra={"format": "password"},
+    )
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, value: object) -> object:
+        if isinstance(value, str):
+            return value.strip().lower()
+        return value
