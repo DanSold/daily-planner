@@ -4,22 +4,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ page_title }}</title>
+    <title>{{ page_title | default("Daily Planner") }}</title>
 
     <link
         rel="stylesheet"
-        href="{{ url_for('static', path='/styles.css') }}"
+        href="{{ url_for('static', path='styles.css') }}"
     >
 </head>
 <body>
     <header class="site-header">
-        <div class="container">
+        <div class="container header-content">
             <a class="brand" href="/">Daily Planner</a>
+            <nav class="main-nav">
+                <a href="/">Planner</a>
+                <a href="/login">Log in</a>
+                <a href="/register">Register</a>
+            </nav>
         </div>
     </header>
 
     <main class="container">
-        {% block content %}{% endblock %}
+        {% if demo_mode %}
+            <div class="demo-banner">Demo preview - displaying sample data (not connected to database).</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error-banner">{{error}}</div>
+        {% endif %}
+
+        {% block content %} {% endblock %}
     </main>
 </body>
 </html>
